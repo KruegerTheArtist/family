@@ -7,6 +7,7 @@ import { HeaderComponent } from './header/header.component';
 import { BabyPushesComponent } from './content/baby-pushes/baby-pushes.component';
 import { NavbarComponent } from './header/navbar/navbar.component';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -33,7 +34,8 @@ import { InsuranceExcelService } from './shared/export.service';
     MatTableModule,
     MatExpansionModule,
     CurrencyPipe,
-    HttpClientModule
+    HttpClientModule,
+    MatIconModule
   ],
   providers: [DataService, InsuranceExcelService, DatePipe],
   bootstrap: [AppComponent]

@@ -33,3 +33,36 @@
         to{ transform: rotate(360deg); }
       }
 }
+
+
+
+@media (max-width: 412px) {
+    .baby-push-button {
+        // text-align: center;
+        left: 20.5vh;
+        top: 13px;
+    }
+
+    .demo-button-container {
+        display: flex;
+        gap: 192px;
+        padding-bottom: 20px;
+    }
+
+    .xlsx-button {
+        margin-top: 15px;
+    }
+
+    .xlsx-button:hover {
+        cursor: pointer;
+    }
+  }
+
+  @media (max-width: 1160px) {
+    .container {
+      @apply max-w-[1075px];
+    }
+    .footer {
+      @apply hidden;
+    }
+  }

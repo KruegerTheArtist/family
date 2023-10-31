@@ -28,7 +28,7 @@ export class BabyPushesComponent implements OnInit {
     // {item: 'Sunscreen', activeDate: new Date(), cost: 4},
     // {item: 'Cooler', activeDate: new Date(), cost: 25},
     // {item: 'Swim suit', activeDate: new Date(), cost: 15},
-    {items: [new Date()], activeDate: new Date(), cost: 0, group: '30.10', total: 1}
+    // {items: [new Date()], activeDate: new Date(), cost: 0, group: '30.10', total: 1}
   ];
 
   data = new ExampleDataSource(this.transactions)
