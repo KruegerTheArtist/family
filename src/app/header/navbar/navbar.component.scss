@@ -1,0 +1,14 @@
+:host {
+    display: flex;
+    height: 50px;
+    background-color: #00ff9e;
+    justify-content: center;
+    align-items: center;
+    border-radius: 7px;
+    border: solid 1px #272bb752;
+    gap: 10px;
+
+    button {
+        height: 25px;
+    }
+}

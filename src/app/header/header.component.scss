@@ -1,0 +1,15 @@
+:host {
+    height: 200px;
+    // background-color: rgba(0, 128, 0, 0.479);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    img {
+        color: #00ff9e;
+    }
+
+    .logo {
+        align-self: center;
+    }
+}
