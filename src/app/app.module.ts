@@ -10,10 +10,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataService } from './content/baby-pushes/baby-pushes.service';
 import { HttpClientModule } from '@angular/common/http';
+import { InsuranceExcelService } from './shared/export.service';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,7 @@ import { HttpClientModule } from '@angular/common/http';
     CurrencyPipe,
     HttpClientModule
   ],
-  providers: [DataService],
+  providers: [DataService, InsuranceExcelService, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

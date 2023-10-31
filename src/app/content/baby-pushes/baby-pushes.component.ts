@@ -3,6 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import {DataSource} from '@angular/cdk/collections';
 import { Observable, ReplaySubject } from 'rxjs';
 import { DataService } from './baby-pushes.service';
+import { InsuranceColumnMap, InsuranceExcelService } from 'src/app/shared/export.service';
 
 export interface ITransaction {
   items: Date[];
@@ -31,7 +32,7 @@ export class BabyPushesComponent implements OnInit {
   ];
 
   data = new ExampleDataSource(this.transactions)
-  constructor(private _cdr: ChangeDetectorRef, private _dataService: DataService) {}
+  constructor(private _cdr: ChangeDetectorRef, private _dataService: DataService, private _export: InsuranceExcelService) {}
 
   ngOnInit(): void {
     this._dataService.getData().subscribe({ next(value) {
@@ -43,6 +44,11 @@ export class BabyPushesComponent implements OnInit {
       this.transactions = babyPushes;
     }
     console.log('this._dataService.getBabyPushes() ', this._dataService.getBabyPushes());
+  }
+
+  export() {
+    let columns = new InsuranceColumnMap();
+    this._export.exportToExcel(this.transactions, columns)
   }
 
   /** Gets the total cost of all transactions. */

@@ -1,9 +1,7 @@
 <div class="demo-button-container">
     <div class="baby-push-button">
-        <img src="https://nuotraukos.mediakatalogas.lt/rsynced_images/button-147230_1280.png" width="50px"
-            height="50px">
-        <img src="https://chopio.club/uploads/posts/2022-08/1660047031_44-beolin-club-p-risunok-pyatki-cheloveka-krasivo-49.png"
-            (click)="addData()" width="20px" height="20px" class="push-button">
+        <img src="https://nuotraukos.mediakatalogas.lt/rsynced_images/button-147230_1280.png" width="50px" height="50px">
+        <img src="https://chopio.club/uploads/posts/2022-08/1660047031_44-beolin-club-p-risunok-pyatki-cheloveka-krasivo-49.png" (click)="addData()" width="20px" height="20px" class="push-button">
         <!-- <button mat-raised-button (click)="addData()" class="push-button">
             Тык
         </button> -->
@@ -11,6 +9,10 @@
     <!-- <button mat-raised-button [disabled]="!dataSource.length" (click)="removeData()" class="demo-button">
         Удалить последнюю запись
     </button> -->
+</div>
+
+<div>
+    <button (click)="export()">Экспортировать в Эксельку</button>
 </div>
 
 <!-- <table mat-table [dataSource]="data" class="our-table">
@@ -41,33 +43,19 @@
     <tbody *ngFor="let item of transactions">
         <ng-container>
             <tr>
-                <mat-accordion>
-                            <mat-expansion-panel class="mat-elevation-z0" (opened)="false">
-                                <mat-expansion-panel-header>
-                                    <mat-panel-title>
-                                        <span class="title">{{ item.group }}</span>
-                                    </mat-panel-title>
-                                </mat-expansion-panel-header>
+                <td class="grouping" colspan="2"><b>{{item.group}}</b></td>
+            </tr>
+            
             <tr *ngFor="let value of item.items; let i=index">
                 <td class="activity-date">{{value | date : 'dd.MM'}}</td>
                 <td>{{value | date : 'HH:mm'}}</td>
                 <!-- <td *ngIf="item.items.length === i+1">{{item.total}}</td> -->
                 <!-- <td>{{value.name}}</td> -->
             </tr>
-            </mat-expansion-panel>
-            </mat-accordion>
-            </tr>
-
-            <tr *ngFor="let value of item.items; let i=index">
-                <td class="activity-date">{{value | date : 'dd.MM'}}</td>
-                <td>{{value | date : 'HH:mm'}}</td>
-                <!-- <td *ngIf="item.items.length === i+1">{{item.total}}</td> -->
-                <!-- <td>{{value.name}}</td> -->
-            </tr>
-            <tr>
+            <tr >
                 <td>Общее количество толчков за день: {{item.total}}</td>
             </tr>
-            <tr>
+            <tr >
                 <br>
             </tr>
         </ng-container>
