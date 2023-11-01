@@ -1,6 +1,8 @@
 .our-table {
-    background-color: #dcd4c0 !important;
+    background-color: #ffffff !important;
     width: 100%;
+    border-radius: 12px;
+    box-shadow: 2px 8px 8px #00000061;
     tr {
         text-align: left;
     }
@@ -8,7 +10,8 @@
     .table-head {
         height: 25px;
         font-size: 16px;
-        background-color: #5f927a;
+        color: #838d96;
+        border-radius: 12px !important;
     }
 
     .activity-date {
@@ -36,7 +39,7 @@
 
 
 
-@media (max-width: 412px) {
+@media (max-width: 420px) {
     .baby-push-button {
         // text-align: center;
         left: 20.5vh;
@@ -45,8 +48,8 @@
 
     .demo-button-container {
         display: flex;
-        gap: 192px;
-        padding-bottom: 20px;
+        justify-content: space-between;
+        padding-bottom: 10px;
     }
 
     .xlsx-button {
