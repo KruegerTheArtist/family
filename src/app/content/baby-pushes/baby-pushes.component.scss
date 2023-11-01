@@ -24,8 +24,8 @@
 
     .push-button {
         position: absolute;
-        left: 15px;
-        top: 15px;
+        left: 24px;
+        top: 23px;
     }
     .push-button:hover {
         animation: rotate 3.5s linear infinite;
@@ -42,7 +42,7 @@
 @media (max-width: 420px) {
     .baby-push-button {
         // text-align: center;
-        left: 20.5vh;
+        left: 17.5vh;
         top: 13px;
     }
 
