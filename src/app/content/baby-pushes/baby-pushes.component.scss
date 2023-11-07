@@ -15,7 +15,12 @@
     }
 
     .activity-date {
-        padding-left: 15px;
+        padding-left: 20px;
+    }
+
+    .grouping {
+        padding-left: 10px;
+        background-color: #f8808a38;
     }
 }
 
@@ -42,14 +47,18 @@
 @media (max-width: 420px) {
     .baby-push-button {
         // text-align: center;
-        left: 17.5vh;
+        right: 4.5vh;
         top: 13px;
     }
 
     .demo-button-container {
         display: flex;
-        justify-content: space-between;
+        justify-content: end;
         padding-bottom: 10px;
+    }
+
+    .our-table {
+        margin-top: 10px;
     }
 
     .xlsx-button {
