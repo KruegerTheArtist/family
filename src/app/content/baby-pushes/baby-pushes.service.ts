@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ITransaction } from './baby-pushes.component';
+import { IBabyPush } from '../../shared/interfaces/baby-push.interface';
 
 @Injectable()
 export class DataService {
@@ -9,7 +9,7 @@ export class DataService {
     PUSHES_KEY = 'baby_pushes';
     constructor(private http: HttpClient) { }
 
-    saveLocal(data: ITransaction[]): void {
+    saveLocal(data: IBabyPush[]): void {
         let haveItem = localStorage.getItem(this.PUSHES_KEY);
         if (haveItem) {
             localStorage.removeItem(this.PUSHES_KEY);
@@ -17,7 +17,7 @@ export class DataService {
         localStorage.setItem(this.PUSHES_KEY, JSON.stringify(data))
     }
 
-    getBabyPushes(): ITransaction[] | void {
+    getBabyPushes(): IBabyPush[] | void {
         let item = localStorage.getItem(this.PUSHES_KEY);
         if (item) {
             return JSON.parse(item);

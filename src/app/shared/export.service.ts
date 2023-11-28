@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Inject, Injectable } from '@angular/core';
 import * as XLSX from 'xlsx';
 import { ComponentType } from '@angular/cdk/portal';
-import { ITransaction } from '../content/baby-pushes/baby-pushes.component';
+import { IBabyPush } from './interfaces/baby-push.interface';
 
 /** Сервис для работы с данными по страховкам */
 @Injectable()
@@ -11,7 +11,7 @@ export class InsuranceExcelService {
   ) {}
 
   /** Выгрузить веб таблицу страховок в Excel */
-  public exportToExcel = (entries: ITransaction[], columns: InsuranceColumnMap): void => {
+  public exportToExcel = (entries: IBabyPush[], columns: InsuranceColumnMap): void => {
     /* Создание имени файлика */
     const filename = `${document.title}_${new Date().toLocaleDateString()}.xlsx`;
 
@@ -40,15 +40,11 @@ export class InsuranceExcelService {
   }
 
   /** Создание массива данных для выгрузки в Excel */
-  private _creteArraysExcelData(insurances: ITransaction[]): string[][] {
+  private _creteArraysExcelData(insurances: IBabyPush[]): string[][] {
     const entryRows: string[][] = [];
 
     insurances.forEach((entry) => {
       const arr: string[] = [];
-    //   console.log('entry?.activeDate ', entry?.activeDate);
-      
-    //   arr.push(String(entry?.activeDate) || '');
-    //   arr.push(`Дата: ${entry?.group}`);
       entryRows.push([`Дата: ${entry?.group}`]);
       if(entry.items && entry.items.length > 0) {
         entry.items.forEach(v => {
@@ -93,7 +89,7 @@ export class InsuranceExcelService {
 
 
 /** Класс с колонками */
-export class InsuranceColumnMap extends Map<keyof ITransaction | string, IColumnDescriptor> {
+export class InsuranceColumnMap extends Map<keyof IBabyPush | string, IColumnDescriptor> {
     constructor() {
       super([
         [
