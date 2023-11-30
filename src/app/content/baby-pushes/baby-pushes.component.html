@@ -3,33 +3,34 @@
         <img src="https://nuotraukos.mediakatalogas.lt/rsynced_images/button-147230_1280.png" width="100px"
             height="100px">
         <img src="https://chopio.club/uploads/posts/2022-08/1660047031_44-beolin-club-p-risunok-pyatki-cheloveka-krasivo-49.png"
-            (click)="addData()" width="50px" height="50px" class="push-button">
+            (click)="addBabyPush()" width="50px" height="50px" class="push-button">
     </div>
     <div class="xlsx-button">
-        <img src="./assets/img/xlsx.png" (click)="export()" width="50px" height="50px">
+        <img src="./assets/img/xlsx.png" (click)="exportToExcel()" width="50px" height="50px">
     </div>
     <div class="xlsx-button">
         <img src="./assets/img/pdf.png" (click)="exportToPdf()" width="50px" height="50px">
     </div>
 </div>
+<ng-container *ngIf="selectedDates.size">
+    <button class="delete-button" (click)="delete()">Удалить</button>
+</ng-container>
 
 <table class="our-table">
     <tr class="table-head">
         <th>Дата</th>
         <th>Время</th>
-        <!-- <th>Total</th> -->
+        <th></th>
     </tr>
-    <tbody *ngFor="let item of transactions">
+    <tbody *ngFor="let item of babyPushes">
         <ng-container>
             <tr>
                 <td class="grouping" colspan="2"><b>{{item.group}}</b></td>
             </tr>
-
-            <tr *ngFor="let value of item.items; let i=index">
+            <tr *ngFor="let value of item.items; let i=index"
+                [class]="isSelected(item.group, value) ? 'selected' : 'standard'" (click)="select(item.group, value)">
                 <td class="activity-date">{{value | date : 'dd.MM'}}</td>
                 <td>{{value | date : 'HH:mm'}}</td>
-                <!-- <td *ngIf="item.items.length === i+1">{{item.total}}</td> -->
-                <!-- <td>{{value.name}}</td> -->
             </tr>
             <tr>
                 <td class="total-count">Общее количество за день: {{item.total}}</td>

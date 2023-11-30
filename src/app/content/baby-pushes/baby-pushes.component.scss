@@ -85,8 +85,26 @@
         padding-bottom: 10px;
     }
 
+    .delete-button {
+        float: right;
+        margin: 0 10px 10px 0;
+        color: #f8808a;
+        background: white;
+        border: 1px solid gray;
+        border-radius: 4px;
+        padding: 5px 15px;
+    }
+
     .our-table {
         margin-top: 10px;
+
+        .selected {
+            background-color: #ff00002e;
+        }
+
+        .standard {
+
+        }
     }
 
     .xlsx-button {

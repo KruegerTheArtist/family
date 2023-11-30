@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { DataSource } from '@angular/cdk/collections';
-import { Observable, ReplaySubject } from 'rxjs';
-import pdfMake from "pdfmake/build/pdfmake";
-import pdfFonts from "pdfmake/build/vfs_fonts";
-import { DataService } from './baby-pushes.service';
-import { InsuranceColumnMap, InsuranceExcelService } from 'src/app/shared/export.service';
-import { DatePipe } from '@angular/common';
-import { Margins } from 'pdfmake/interfaces';
+import { ExportService } from '../../shared/export.service';
 import { IBabyPush } from '../../shared/interfaces/baby-push.interface';
+import { getCurrentNumberWeeksAndDays } from '../../shared/utils/date-helper.utils';
+import { DataService } from './baby-pushes.service';
 
+/** Таблица толчков */
 @Component({
   selector: 'app-baby-pushes',
   templateUrl: './baby-pushes.component.html',
@@ -16,34 +12,132 @@ import { IBabyPush } from '../../shared/interfaces/baby-push.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BabyPushesComponent implements OnInit, OnDestroy {
-  // displayedColumns: string[] = ['activeDate', 'activeTime'];
-  transactions: IBabyPush[] = [
-  ];
+  /** Толчки детёныша */
+  babyPushes: IBabyPush[] = [];
 
-  data = new ExampleDataSource(this.transactions)
-  constructor(private _cdr: ChangeDetectorRef, private _dataService: DataService, private _export: InsuranceExcelService, private _datePipe: DatePipe) { }
+  /** Выбранные для удаления даты */
+  selectedDates: Map<string, Date[]> = new Map<string, Date[]>();
 
+  /** @inheritdoc */
+  constructor(
+    private _dataService: DataService,
+    private _exportService: ExportService,
+    private _cdr: ChangeDetectorRef) { }
+
+  /** @inheritdoc */
   ngOnInit(): void {
     let babyPushes = this._dataService.getBabyPushes() as IBabyPush[];
-    let multiGroup: string = '';
-    babyPushes.forEach(xs => {
-      if (xs.group.length > 5) {
-        let temp = xs.group.slice(0, 5);
-        if (temp[4] === '.') {
-          temp = temp.slice(0, 4);
-        }
-        console.log('temp', temp);
-        xs.group = temp;
+    this._checkMultiGroup(babyPushes);
+    if (babyPushes) {
+      this.babyPushes = babyPushes;
+    }
+    this._cdr.detectChanges();
+  }
+
+  /** @inheritdoc */
+  ngOnDestroy(): void {
+    this._dataService.saveLocal([...this.babyPushes.filter(x => x.group !== '31.10 27 нед.')]);
+  }
+
+  /** Выбран ли элемент */
+  isSelected(itemGroup: string, value: Date): boolean {
+    const dates = this.selectedDates.get(itemGroup);
+    return !!dates && dates.includes(value);
+  }
+
+  /** Выбрать запись для удаления */
+  select(itemGroup: string, value: Date): void {
+    const dates = this.selectedDates.get(itemGroup);
+    if (dates && dates.includes(value)) {
+      const newDates = dates.filter(x => x !== value);
+      if (newDates.length) {
+        this.selectedDates.set(itemGroup, dates.filter(x => x !== value));
+      } else {
+        this.selectedDates.delete(itemGroup);
+      }
+    }
+    if (!dates || !dates.includes(value)) {
+      if (dates) {
+        this.selectedDates.set(itemGroup, [value, ...dates]);
+      } else {
+        this.selectedDates.set(itemGroup, [value]);
+      }
+    }
+  }
+
+  /** Добавить толчок */
+  addBabyPush(): void {
+    const currentDate = new Date();
+    const day = currentDate.getDate();
+    const month = currentDate.getMonth() + 1;
+    const groupString = `${day}.${month}${getCurrentNumberWeeksAndDays()}`;
+    this.babyPushes.forEach(x => {
+      if (x.group.length < 6) {
+        x.group = x.group + getCurrentNumberWeeksAndDays(this._getDate(x));
       }
     })
-    // console.log(this.getCurrentNumberWeeksAndDays(new Date('2023-11-13')));
 
+    const transIndex = this.babyPushes.findIndex(x => x.group === groupString);
+    if (transIndex > -1) {
+      this.babyPushes[transIndex].items.push(new Date());
+      this.babyPushes[transIndex].total += 1;
+      this.babyPushes[transIndex].items.sort();
+    } else {
+      this.babyPushes.push({ items: [new Date()], group: groupString, total: 1 })
+    }
+    this._dataService.saveLocal([...this.babyPushes.filter(x => x.group !== '31.10 27 нед.')]);
+    this._cdr.detectChanges();
+    let elem = document.getElementsByClassName('our-table');
+    elem[0].scrollTo(document.body.scrollHeight, 13000)
+  }
 
+  /** Удалить выбранные записи */
+  delete(): void {
+    if (this.selectedDates.size) {
+      this.selectedDates.forEach((v, k) => {
+        const pushesIndex = this.babyPushes.findIndex(x => x.group === k);
+        if (pushesIndex > -1) {
+          v.forEach(d => {
+            this.babyPushes[pushesIndex].items = this.babyPushes[pushesIndex].items.filter(i => i !== d);
+            this.babyPushes[pushesIndex].total -= 1;
+          })
+        }
+      })
+      this._dataService.saveLocal([...this.babyPushes.filter(x => x.group !== '31.10 27 нед.')]);
+      this.selectedDates.clear();
+      this._cdr.detectChanges();
+    }
+  }
+
+  /** Экспорт в excel */
+  exportToExcel(): void {
+    this._exportService.exportToExcel(this.babyPushes)
+  }
+
+  /** Экспорт в pdf */
+  exportToPdf(): void {
+    this._exportService.exportToPdf(this.babyPushes);
+  }
+
+  /** Проверить на мультигруппы */
+  private _checkMultiGroup(babyPushes: IBabyPush[]): void {
+    let freakGroup = babyPushes.find(x => x.group === '9.11 . 28 нед.  и 2 дн.');
+      console.log('freak', babyPushes);
+      if (freakGroup) {
+      console.log('freak');
+      
+      freakGroup.group = '9.11. 28 нед. и 2 дн.';
+    }
+    /** Если групп несколько */
+    let multiGroup: string = '';
+
+    /** Если групп несколько */
     babyPushes.forEach(xs => {
       if (babyPushes.filter(x => x.group === xs.group).length > 1) {
         multiGroup = xs.group;
       }
     })
+    /** Если групп несколько */
     if (multiGroup) {
       let index = babyPushes.findIndex(b => b.group === multiGroup);
       if (index > -1) {
@@ -55,138 +149,31 @@ export class BabyPushesComponent implements OnInit, OnDestroy {
       }
     }
     babyPushes = [...babyPushes.map(x => {
-      return { group: x.group, items: x.items, total: x.total }
+      return { group: x.group, items: x.items.sort((a, b) => a > b ? 1 : -1), total: x.total }
     })]
-    if (babyPushes) {
-      this.transactions = babyPushes;
-    }
-    // this._dataService.saveLocal([...this.transactions.filter(x => x.group !== '31.10 27 нед.')]);
   }
 
-  ngOnDestroy(): void {
-    this._dataService.saveLocal([...this.transactions.filter(x => x.group !== '31.10 27 нед.')]);
-  }
-
-  getCurrentNumberWeeksAndDays(curr = new Date()) {
-    let firstDate = new Date("2023-04-25");
-    curr.setHours(0);
-    curr.setMinutes(0);
-    curr.setSeconds(0);
-    curr.setMilliseconds(0);
-    var weeks = Math.floor((curr as any - (firstDate as any)) / 604800000);
-    const days = (curr as any - (firstDate as any)) / (1000 * 60 * 60 * 24);
-    console.log('weeks ', weeks, 'days ', days, 'main ', (Math.ceil(days) - weeks * 7));
-    // let difWeeks = days weeks
-    let displayDays = (Math.ceil(days) - weeks * 7);
-    if(displayDays === 7) {
-      weeks += 1;
-      displayDays = 0;
-    }
-    let strDay = displayDays === 0 ? '' : ` и ${displayDays} дн.`;
-    return `. ${weeks} нед. ${strDay}`
-  }
-
-  export() {
-    let columns = new InsuranceColumnMap();
-    this._export.exportToExcel(this.transactions, columns)
-  }
-
-  exportToPdf() {
-    pdfMake.vfs = pdfFonts.pdfMake.vfs;
-    let array = this.transactions.map(x => ([// Previous configuration  
-      {
-        text: String(`${x.group}`),
-        style: 'sectionHeader'
-      },
-      {
-        style: 'tableExample',
-        table: {
-          headerRows: 1,
-          widths: ['*', 'auto'],
-          body: [
-            ['Дата', 'Время'],
-            ...x.items?.map((v, i) => {
-              v = new Date(v);
-              return [String(`${v.getDate()}.${v.getMonth() + 1}`), String(this._datePipe.transform(v, 'HH:mm'))]
-            }),
-            ['Общее количество толчков: ', x.items.length]
-          ]
+  /** Редко используемая штука для чистки группы */
+  private _clearAdditionalInfoInToGroup(babyPushes: IBabyPush[]): void {
+    babyPushes.forEach(xs => {
+      if (xs.group.length > 5) {
+        let temp = xs.group.slice(0, 5);
+        if (temp[4] === '.') {
+          temp = temp.slice(0, 4);
         }
-      }]))
-    let docDefinition = {
-      header: 'Таблица толчков',
-      content: [array],
-      styles: {
-        sectionHeader: {
-          bold: true,
-          margin: [0, 15, 0, 0] as Margins,
-        }
-      }
-    };
-
-    pdfMake.createPdf(docDefinition).open();
-  }
-
-  addData() {
-    const currentDate = new Date();
-    const day = currentDate.getDate();
-    const month = currentDate.getMonth() + 1;
-    const groupString = `${day}.${month}${this.getCurrentNumberWeeksAndDays()}`;
-
-    const transIndex = this.transactions.findIndex(x => x.group === groupString);
-    if (transIndex > -1) {
-      this.transactions[transIndex].items.push(new Date());
-      this.transactions[transIndex].total += 1;
-      this.transactions[transIndex].items.sort();
-    } else {
-      this.transactions.push({ items: [new Date()], group: groupString, total: 1 })
-    }
-    this.transactions.forEach(x => {
-      if (x.group.length < 6) {
-        x.group = x.group + this.getCurrentNumberWeeksAndDays(this._getDate(x));
+        console.log('temp', temp);
+        // xs.group = temp;
       }
     })
-    this._dataService.saveLocal([...this.transactions.filter(x => x.group !== '31.10 27 нед.')]);
-    this._cdr.detectChanges();
-    // window.scrollTo();
-    let elem = document.getElementsByClassName('our-table');
-    elem[0].scrollTo(document.body.scrollHeight, 3000)
   }
 
-  private _getDate(x: IBabyPush) {
-    console.log('DATE ', x.group.split('.').map(x => {
-      if (x.length == 1) {
-        return `0${x}`.trim()
-      }
-      return x.trim()
-    }).reverse().join('-') + '-2023'
-    );
-
-    return new Date(x.group.split('.').map(x => {
+  /** Получение даты в формате ММ-DD-YYYY */
+  private _getDate(babyPush: IBabyPush): Date {
+    return new Date(babyPush.group.split('.').map(x => {
       if (x.length == 1) {
         return `0${x}`.trim()
       }
       return x.trim()
     }).reverse().join('-') + '-2023')
-  }
-
-}
-
-class ExampleDataSource extends DataSource<IBabyPush> {
-  private _dataStream = new ReplaySubject<IBabyPush[]>();
-
-  constructor(initialData: IBabyPush[]) {
-    super();
-    this.setData(initialData);
-  }
-
-  connect(): Observable<IBabyPush[]> {
-    return this._dataStream;
-  }
-
-  disconnect() { }
-
-  setData(data: IBabyPush[]) {
-    this._dataStream.next(data);
   }
 }

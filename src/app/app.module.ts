@@ -15,7 +15,7 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataService } from './content/baby-pushes/baby-pushes.service';
 import { HttpClientModule } from '@angular/common/http';
-import { InsuranceExcelService } from './shared/export.service';
+import { ExportService } from './shared/export.service';
 
 @NgModule({
   declarations: [
@@ -37,7 +37,7 @@ import { InsuranceExcelService } from './shared/export.service';
     HttpClientModule,
     MatIconModule
   ],
-  providers: [DataService, InsuranceExcelService, DatePipe],
+  providers: [DataService, ExportService, DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
